@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp" android:height="180dp"
+    android:viewportWidth="320" android:viewportHeight="180">
+    <path android:fillColor="#1B2838" android:pathData="M0,0h320v180h-320z" />
+    <!-- simple gamepad silhouette -->
+    <path android:fillColor="#66C0F4"
+        android:pathData="M100,60h120a40,40 0,0 1,40 40v10a30,30 0,0 1,-52 20l-14,-14h-68l-14,14a30,30 0,0 1,-52 -20v-10a40,40 0,0 1,40 -40z" />
+    <path android:fillColor="#1B2838" android:pathData="M115,82h10v10h10v10h-10v10h-10v-10h-10v-10h10z" />
+    <path android:fillColor="#1B2838" android:pathData="M205,90m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0" />
+</vector>

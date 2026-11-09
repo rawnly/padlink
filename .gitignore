@@ -1,0 +1,20 @@
+# Android / Gradle
+.gradle/
+.kotlin/
+build/
+local.properties
+*.apk
+
+# IDE
+.idea/
+*.iml
+
+# Windows tray app build output
+windows/**/bin/
+windows/**/obj/
+windows/**/publish/
+windows/**/publish-small/
+
+# OS
+Thumbs.db
+.DS_Store

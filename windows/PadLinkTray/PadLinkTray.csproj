@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyName>PadLink</AssemblyName>
+    <RootNamespace>PadLink</RootNamespace>
+    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
+    <Version>0.1.0</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- usbip-win2 installer (signed driver), extracted and run on first launch if the driver is missing -->
+    <EmbeddedResource Include="driver\USBip-setup-x64.exe" LogicalName="usbip-setup.exe" />
+  </ItemGroup>
+
+</Project>
