@@ -19,7 +19,12 @@ class UsbIpServer(private val usb: UsbManager, private val deviceName: () -> Str
     fun exportedDevices(): List<UsbDevice> =
         usb.deviceList.values.filter { usb.hasPermission(it) }.sortedBy { it.deviceName }
 
+    private val clients = ConcurrentHashMap<String, String>() // busid -> PC address
+
     fun isAttached(busId: String) = sessions.containsKey(busId)
+
+    /** Address of the PC currently using this device, or null. */
+    fun clientOf(busId: String): String? = clients[busId]
 
     fun start() {
         val ss = ServerSocket(UsbIp.PORT).apply { reuseAddress = true }
@@ -88,8 +93,13 @@ class UsbIpServer(private val usb: UsbManager, private val deviceName: () -> Str
                     UsbIp.writeDevice(out, dev, withInterfaces = false)
                     out.flush()
                     sessions[busId] = session
+                    clients[busId] = peer.hostAddress ?: "?"
                     StatusLog.add("${dev.productName ?: busId} attached by ${peer.hostAddress}")
-                    try { session.run() } finally { sessions.remove(busId) }
+                    try { session.run() } finally {
+                        sessions.remove(busId)
+                        clients.remove(busId)
+                        StatusLog.listener?.invoke() // refresh the TV screen
+                    }
                 }
                 else -> s.close()
             }

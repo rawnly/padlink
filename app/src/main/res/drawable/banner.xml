@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Android TV home-screen banner (320x180): blue gradient with the PadLink gamepad. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
     android:width="320dp" android:height="180dp"
     android:viewportWidth="320" android:viewportHeight="180">
-    <path android:fillColor="#1B2838" android:pathData="M0,0h320v180h-320z" />
-    <!-- simple gamepad silhouette -->
-    <path android:fillColor="#66C0F4"
-        android:pathData="M100,60h120a40,40 0,0 1,40 40v10a30,30 0,0 1,-52 20l-14,-14h-68l-14,14a30,30 0,0 1,-52 -20v-10a40,40 0,0 1,40 -40z" />
-    <path android:fillColor="#1B2838" android:pathData="M115,82h10v10h10v10h-10v10h-10v-10h-10v-10h10z" />
-    <path android:fillColor="#1B2838" android:pathData="M205,90m-8,0a8,8 0,1 1,16 0a8,8 0,1 1,-16 0" />
+    <path android:pathData="M0,0h320v180h-320z">
+        <aapt:attr name="android:fillColor">
+            <gradient android:type="linear"
+                android:startX="0" android:startY="0" android:endX="320" android:endY="180"
+                android:startColor="#FF388EFF" android:endColor="#FF123FA8" />
+        </aapt:attr>
+    </path>
+    <group android:translateX="80" android:translateY="2.5" android:scaleX="5" android:scaleY="5">
+        <path android:fillColor="#FFFFFFFF" android:pathData="M10,10h12a5,5 0,0 1,5,5v0.5a5,5 0,0 1,-5,5h-12a5,5 0,0 1,-5,-5v-0.5a5,5 0,0 1,5,-5z" />
+        <path android:fillColor="#FFFFFFFF" android:pathData="M4.2,18.75a4.75,6.25 0,1 0,9.5,0a4.75,6.25 0,1 0,-9.5,0z" />
+        <path android:fillColor="#FFFFFFFF" android:pathData="M18.3,18.75a4.75,6.25 0,1 0,9.5,0a4.75,6.25 0,1 0,-9.5,0z" />
+        <path android:fillColor="#FF2A6FE8" android:pathData="M7.6,14.3h4.6v1.6h-4.6z M9.1,12.8h1.6v4.6h-1.6z" />
+        <path android:fillColor="#FF2A6FE8" android:pathData="M20.6,13.7a1.1,1.1 0,1 0,2.2,0a1.1,1.1 0,1 0,-2.2,0z M18.4,16.1a1.1,1.1 0,1 0,2.2,0a1.1,1.1 0,1 0,-2.2,0z" />
+    </group>
 </vector>

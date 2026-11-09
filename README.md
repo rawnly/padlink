@@ -8,6 +8,12 @@ Steam Controller --USB--> Android TV (PadLink, USB/IP server :3240) ==TCP==> Win
 
 PadLink passes raw USB through (the USB/IP protocol), so Steam sees the genuine Valve device. Trackpads, gyro, haptics and Steam Input all behave as if the controller were plugged into the PC.
 
+| Windows app | TV app |
+|---|---|
+| <img src="docs/screenshots/windows.png" width="300" alt="PadLink on Windows: controller connected through TV Salotto"> | <img src="docs/screenshots/tv.png" width="520" alt="PadLink on Android TV: connected to your PC"> |
+
+The Windows app's icon can be regenerated with `windows/tools/make-icon.ps1`.
+
 ## 1. Build and install on the TV
 
 1. Open this folder in **Android Studio** (it creates the Gradle wrapper and SDK the first time), then run **Build > Build APK(s)**.

@@ -3,18 +3,32 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <!-- WinForms only for the tray NotifyIcon -->
     <UseWindowsForms>true</UseWindowsForms>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>PadLink</AssemblyName>
     <RootNamespace>PadLink</RootNamespace>
-    <ApplicationHighDpiMode>PerMonitorV2</ApplicationHighDpiMode>
-    <Version>0.1.0</Version>
+    <ApplicationIcon>padlink.ico</ApplicationIcon>
+    <Version>0.2.0</Version>
   </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Avoid WPF/WinForms name clashes (Application, Button, Color...): WinForms types are fully qualified. -->
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+    <Using Include="System.IO" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="WPF-UI" Version="4.3.0" />
+  </ItemGroup>
 
   <ItemGroup>
     <!-- usbip-win2 installer (signed driver), extracted and run on first launch if the driver is missing -->
     <EmbeddedResource Include="driver\USBip-setup-x64.exe" LogicalName="usbip-setup.exe" />
+    <Resource Include="padlink.ico" />
   </ItemGroup>
 
 </Project>

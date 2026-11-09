@@ -1,0 +1,178 @@
+<ui:FluentWindow x:Class="PadLink.MainWindow"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:ui="http://schemas.lepo.co/wpfui/2022/xaml"
+                 Title="PadLink"
+                 Width="500" Height="760" MinWidth="440" MinHeight="560"
+                 WindowStartupLocation="CenterScreen"
+                 ExtendsContentIntoTitleBar="True"
+                 WindowBackdropType="Mica"
+                 WindowCornerPreference="Round">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <ui:TitleBar Grid.Row="0" Title="PadLink" ShowMaximize="False">
+            <ui:TitleBar.Icon>
+                <ui:ImageIcon Source="pack://application:,,,/padlink.ico" />
+            </ui:TitleBar.Icon>
+        </ui:TitleBar>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="24,8,24,24">
+
+                <!-- ===== Status hero ===== -->
+                <ui:Card Padding="20" Margin="0,0,0,12">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Border x:Name="StatusBadge" Width="60" Height="60" CornerRadius="30"
+                                VerticalAlignment="Center" Background="#33969696">
+                            <ui:SymbolIcon x:Name="StatusIcon" Symbol="XboxController24" FontSize="30"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <StackPanel Grid.Column="1" Margin="16,0,8,0" VerticalAlignment="Center">
+                            <ui:TextBlock x:Name="StatusTitle" FontTypography="Subtitle" Text="Starting…" />
+                            <ui:TextBlock x:Name="StatusDetail" Appearance="Secondary" TextWrapping="Wrap"
+                                          Margin="0,2,0,0" Text="" />
+                        </StackPanel>
+                        <Border x:Name="PingChip" Grid.Column="2" CornerRadius="12" Padding="10,4"
+                                VerticalAlignment="Center" Visibility="Collapsed"
+                                Background="{DynamicResource ControlFillColorSecondaryBrush}">
+                            <StackPanel Orientation="Horizontal">
+                                <ui:SymbolIcon Symbol="Wifi124" FontSize="13" Margin="0,0,5,0" />
+                                <TextBlock x:Name="PingText" FontSize="12" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </ui:Card>
+
+                <ui:Button x:Name="ConnectButton" Appearance="Primary" HorizontalAlignment="Stretch"
+                           Height="40" Margin="0,0,0,28" Content="Connect"
+                           Icon="{ui:SymbolIcon PlugConnected24}" Click="ConnectButton_Click" />
+
+                <!-- ===== TV ===== -->
+                <Grid Margin="0,0,0,8">
+                    <ui:TextBlock FontTypography="BodyStrong" Text="Your TV" VerticalAlignment="Center" />
+                    <ui:Button x:Name="FindButton" HorizontalAlignment="Right" Appearance="Transparent"
+                               Icon="{ui:SymbolIcon Search24}" Content="Find TVs" Click="FindButton_Click" />
+                </Grid>
+
+                <ui:Card x:Name="NoTvCard" Padding="16" Margin="0,0,0,4">
+                    <StackPanel Orientation="Horizontal">
+                        <ui:ProgressRing x:Name="ScanRing" IsIndeterminate="True" Width="20" Height="20"
+                                         Margin="0,0,12,0" Visibility="Collapsed" />
+                        <ui:TextBlock x:Name="NoTvText" Appearance="Secondary" TextWrapping="Wrap"
+                                      Text="Open PadLink on your TV, then click Find TVs." />
+                    </StackPanel>
+                </ui:Card>
+
+                <ItemsControl x:Name="TvList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <ui:CardAction Margin="0,0,0,4" Padding="14" Click="TvCard_Click" Tag="{Binding}"
+                                           Icon="{ui:SymbolIcon Tv24}">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel>
+                                        <ui:TextBlock FontTypography="BodyStrong" Text="{Binding Name}" />
+                                        <ui:TextBlock Appearance="Secondary" FontSize="12" Text="{Binding Detail}" />
+                                    </StackPanel>
+                                    <Border Grid.Column="1" CornerRadius="10" Padding="8,2" Margin="8,0,0,0"
+                                            VerticalAlignment="Center"
+                                            Background="{DynamicResource SystemFillColorSuccessBackgroundBrush}"
+                                            Visibility="{Binding SelectedVisibility}">
+                                        <TextBlock Text="Selected" FontSize="11"
+                                                   Foreground="{DynamicResource SystemFillColorSuccessBrush}" />
+                                    </Border>
+                                </Grid>
+                            </ui:CardAction>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+
+                <ui:CardExpander Margin="0,0,0,28" Icon="{ui:SymbolIcon Edit24}" Padding="16">
+                    <ui:CardExpander.Header>
+                        <StackPanel>
+                            <ui:TextBlock Text="Enter address manually" />
+                            <ui:TextBlock x:Name="CurrentHostText" Appearance="Secondary" FontSize="12" Text="" />
+                        </StackPanel>
+                    </ui:CardExpander.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <ui:TextBox x:Name="HostBox" PlaceholderText="192.168.1.50 or Tailscale 100.x.y.z"
+                                    KeyDown="HostBox_KeyDown" />
+                        <ui:Button Grid.Column="1" Margin="8,0,0,0" Content="Use" Click="UseHost_Click" />
+                    </Grid>
+                </ui:CardExpander>
+
+                <!-- ===== Settings ===== -->
+                <ui:TextBlock FontTypography="BodyStrong" Text="Settings" Margin="0,0,0,8" />
+
+                <ui:CardControl Margin="0,0,0,4" Icon="{ui:SymbolIcon Power24}">
+                    <ui:CardControl.Header>
+                        <StackPanel>
+                            <ui:TextBlock Text="Start with Windows" />
+                            <ui:TextBlock Appearance="Secondary" FontSize="12" Text="Runs quietly in the tray and reconnects on its own" />
+                        </StackPanel>
+                    </ui:CardControl.Header>
+                    <ui:ToggleSwitch x:Name="StartupSwitch" Click="StartupSwitch_Click" />
+                </ui:CardControl>
+
+                <ui:CardControl Margin="0,0,0,4" Icon="{ui:SymbolIcon Shield24}">
+                    <ui:CardControl.Header>
+                        <StackPanel>
+                            <ui:TextBlock Text="USB driver" />
+                            <ui:TextBlock x:Name="DriverText" Appearance="Secondary" FontSize="12" Text="Checking…" />
+                        </StackPanel>
+                    </ui:CardControl.Header>
+                    <ui:Button x:Name="DriverButton" Content="Install" Visibility="Collapsed" Click="DriverButton_Click" />
+                </ui:CardControl>
+
+                <ui:CardExpander Margin="0,0,0,4" Icon="{ui:SymbolIcon Wrench24}" Padding="16">
+                    <ui:CardExpander.Header>
+                        <StackPanel>
+                            <ui:TextBlock Text="Advanced" />
+                            <ui:TextBlock Appearance="Secondary" FontSize="12" Text="Which USB device to share" />
+                        </StackPanel>
+                    </ui:CardExpander.Header>
+                    <StackPanel>
+                        <ui:TextBlock Appearance="Secondary" FontSize="12" TextWrapping="Wrap" Margin="0,0,0,8"
+                                      Text="USB vendor id in hex. 28de = Valve (Steam Controller)." />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <ui:TextBox x:Name="VendorBox" PlaceholderText="28de" />
+                            <ui:Button Grid.Column="1" Margin="8,0,0,0" Content="Save" Click="SaveVendor_Click" />
+                        </Grid>
+                    </StackPanel>
+                </ui:CardExpander>
+
+                <ui:CardExpander Margin="0,0,0,20" Icon="{ui:SymbolIcon History24}" Padding="12">
+                    <ui:CardExpander.Header>
+                        <ui:TextBlock Text="Activity" />
+                    </ui:CardExpander.Header>
+                    <TextBox x:Name="LogBox" IsReadOnly="True" Height="180" TextWrapping="NoWrap"
+                             VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                             FontFamily="Cascadia Mono, Consolas" FontSize="11" />
+                </ui:CardExpander>
+
+                <ui:Button HorizontalAlignment="Center" Appearance="Transparent" Content="Quit PadLink"
+                           Icon="{ui:SymbolIcon Dismiss24}" Click="Quit_Click" />
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</ui:FluentWindow>
