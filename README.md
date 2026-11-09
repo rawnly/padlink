@@ -23,7 +23,7 @@ The Windows app's icon can be regenerated with `windows/tools/make-icon.ps1`.
    adb install app/build/outputs/apk/debug/app-debug.apk
    ```
 3. Plug the controller (or its wireless puck) into the TV. Android asks to open PadLink: tick **"Always"** and press OK.
-4. The PadLink screen lists the TV's IPs, the shared device with its **bus id** (e.g. `1-3`), and the exact attach command.
+4. The PadLink screen shows the status, the TV's name and addresses, and the shared controller. Once a PC uses the controller, it also shows which PC.
 
 PadLink runs as a foreground service with a low-latency Wi-Fi lock. It keeps running after you leave the app. Use wired Ethernet on the TV if you can.
 
@@ -42,12 +42,14 @@ Only one PC can attach the device at a time.
 
 ### Easiest: the PadLink tray app (`windows/PadLinkTray`)
 
-This is a small native C# / WinForms app that sits in the system tray:
+This is a native Windows 11-style app (C# / WPF with [WPF-UI](https://github.com/lepoco/wpfui)). It follows the system light/dark theme and lives in the system tray:
 
-- Enter the TV address once (LAN IP or Tailscale `100.x`). It finds the controller and attaches it, then re-attaches after drops, reboots and replugs.
-- The tray icon shows the state: green = connected, yellow = waiting, red = error, grey = off.
-- The window shows the live round-trip time to the TV and the input lag it adds.
-- It has a "Start with Windows" option, a Detach button and an Exit button. Exit detaches the controller.
+- **Finds your TV by itself.** It scans the LAN and your Tailscale peers, and you pick the TV from a list. You can also enter an address by hand (LAN IP or Tailscale `100.x`). If the TV's IP changes, PadLink finds it again by name.
+- **Connects automatically.** It attaches the controller, then re-attaches after drops, reboots and replugs. One button connects or disconnects.
+- **Shows the state.** The window has the status and the live ping to the TV. The tray icon has a status dot: green = connected, amber = waiting, red = error, grey = off.
+- **Installs the USB driver.** If usbip-win2 is missing, it offers to install the bundled copy.
+- **Settings:** Start with Windows, the vendor id (under Advanced), and an Activity log.
+- Closing the window keeps PadLink in the tray. Quit detaches the controller.
 
 To build it, install the .NET 8 SDK (`winget install Microsoft.DotNet.SDK.8`), then:
 
@@ -56,7 +58,7 @@ cd windows\PadLinkTray
 dotnet publish -c Release -r win-x64 --self-contained -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:EnableCompressionInSingleFile=true -p:DebugType=none -o publish
 ```
 
-The result is `publish\PadLink.exe`, about 68 MB and runnable on any Windows PC. For a 0.2 MB exe on PCs that have the .NET 8 Desktop Runtime installed, add `--self-contained false` instead and drop the compression flags. usbip-win2 must still be installed: PadLink drives its `usbip.exe`.
+The result is `publish\PadLink.exe`, about 96 MB and runnable on any Windows PC. For a much smaller exe on PCs that have the .NET 8 Desktop Runtime installed, use `--self-contained false` instead and drop the compression flags. PadLink drives usbip-win2's `usbip.exe`. If the driver isn't installed, the app offers to install it.
 
 ### Alternative: the auto-attach script
 
