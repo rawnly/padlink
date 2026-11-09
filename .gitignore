@@ -18,3 +18,7 @@ windows/**/publish-small/
 # OS
 Thumbs.db
 .DS_Store
+keystore.properties
+*.jks
+*.keystore
+dist/
