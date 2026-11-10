@@ -48,10 +48,22 @@ This is a native Windows 11-style app (C# / WPF with [WPF-UI](https://github.com
 - **Connects automatically.** It attaches the controller, then re-attaches after drops, reboots and replugs. One button connects or disconnects.
 - **Shows the state.** The window has the status and the live ping to the TV. The tray icon has a status dot: green = connected, amber = waiting, red = error, grey = off.
 - **Installs the USB driver.** If usbip-win2 is missing, it offers to install the bundled copy.
+- **Updates itself.** Installed copies check GitHub Releases at startup and every 6 hours, and download new versions in the background. An update installs when you click **Restart now** (Settings → Updates, or the tray menu) or when you quit PadLink. The controller stays attached across the restart.
 - **Settings:** Start with Windows, the vendor id (under Advanced), and an Activity log.
 - Closing the window keeps PadLink in the tray. Quit detaches the controller.
 
-To build it, install the .NET 8 SDK (`winget install Microsoft.DotNet.SDK.8`), then:
+**Install:** download `PadLink-win-Setup.exe` from the [latest release](https://github.com/rawnly/padlink/releases/latest) and run it. It installs per user (no admin prompt) into `%LocalAppData%\PadLink` and adds Start menu and desktop shortcuts. Uninstall it from Windows Settings → Apps.
+
+**Releasing (maintainers):** push a version tag and the [Windows release workflow](.github/workflows/windows-release.yml) builds the app, packs it with [Velopack](https://velopack.io) and publishes it to GitHub Releases, where installed copies pick it up:
+
+```
+git tag v0.3.0
+git push origin v0.3.0
+```
+
+You can also run the workflow by hand from the Actions tab with a version number. If a release for that tag already exists (for example with the APK), the Windows files are added to it.
+
+**Local builds** don't update themselves. The Updates row shows them as a development build. To build it, install the .NET 8 SDK (`winget install Microsoft.DotNet.SDK.8`), then:
 
 ```
 cd windows\PadLinkTray

@@ -12,6 +12,8 @@
     <RootNamespace>PadLink</RootNamespace>
     <ApplicationIcon>padlink.ico</ApplicationIcon>
     <Version>0.2.0</Version>
+    <!-- Program.Main runs Velopack's hooks before WPF starts -->
+    <StartupObject>PadLink.Program</StartupObject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,6 +25,8 @@
 
   <ItemGroup>
     <PackageReference Include="WPF-UI" Version="4.3.0" />
+    <!-- OTA updates from GitHub Releases. Keep in step with VPK_VERSION in .github/workflows/windows-release.yml -->
+    <PackageReference Include="Velopack" Version="1.2.161" />
   </ItemGroup>
 
   <ItemGroup>

@@ -140,6 +140,16 @@
                     <ui:Button x:Name="DriverButton" Content="Install" Visibility="Collapsed" Click="DriverButton_Click" />
                 </ui:CardControl>
 
+                <ui:CardControl Margin="0,0,0,4" Icon="{ui:SymbolIcon ArrowSync24}">
+                    <ui:CardControl.Header>
+                        <StackPanel>
+                            <ui:TextBlock Text="Updates" />
+                            <ui:TextBlock x:Name="UpdateText" Appearance="Secondary" FontSize="12" TextWrapping="Wrap" Text="" />
+                        </StackPanel>
+                    </ui:CardControl.Header>
+                    <ui:Button x:Name="UpdateButton" Content="Check now" Visibility="Collapsed" Click="UpdateButton_Click" />
+                </ui:CardControl>
+
                 <ui:CardExpander Margin="0,0,0,4" Icon="{ui:SymbolIcon Wrench24}" Padding="16">
                     <ui:CardExpander.Header>
                         <StackPanel>

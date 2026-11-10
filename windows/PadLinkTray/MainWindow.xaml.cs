@@ -25,6 +25,7 @@ public partial class MainWindow : FluentWindow
     public event Action? InstallDriverClicked;
     public event Action? QuitClicked;
     public event Action? HiddenToTray;
+    public event Action? UpdateClicked;
 
     readonly Settings settings;
     List<FoundTv> found = [];
@@ -102,6 +103,16 @@ public partial class MainWindow : FluentWindow
         DriverButton.Visibility = ready || installing ? Visibility.Collapsed : Visibility.Visible;
     }
 
+    /// <summary>The Updates row. A null button hides the button.</summary>
+    public void SetUpdateStatus(string text, string? button, bool primary = false, bool enabled = true)
+    {
+        UpdateText.Text = text;
+        UpdateButton.Visibility = button == null ? Visibility.Collapsed : Visibility.Visible;
+        UpdateButton.Content = button ?? "";
+        UpdateButton.IsEnabled = enabled;
+        UpdateButton.Appearance = primary ? ControlAppearance.Primary : ControlAppearance.Secondary;
+    }
+
     public void Log(string line)
     {
         LogBox.AppendText($"{DateTime.Now:HH:mm:ss}  {line}{Environment.NewLine}");
@@ -140,6 +151,7 @@ public partial class MainWindow : FluentWindow
     void FindButton_Click(object sender, RoutedEventArgs e) => FindClicked?.Invoke();
     void DriverButton_Click(object sender, RoutedEventArgs e) => InstallDriverClicked?.Invoke();
     void Quit_Click(object sender, RoutedEventArgs e) => QuitClicked?.Invoke();
+    void UpdateButton_Click(object sender, RoutedEventArgs e) => UpdateClicked?.Invoke();
 
     void TvCard_Click(object sender, RoutedEventArgs e)
     {
