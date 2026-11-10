@@ -22,3 +22,6 @@ keystore.properties
 *.jks
 *.keystore
 dist/
+
+# Velopack output
+Releases/

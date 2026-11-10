@@ -7,10 +7,12 @@ namespace PadLink;
 public sealed class Controller
 {
     readonly Settings settings = Settings.Load();
+    readonly Updater updater = new();
     readonly Forms.NotifyIcon tray;
     readonly MainWindow window;
     readonly Forms.ToolStripMenuItem connectItem;
     readonly Forms.ToolStripMenuItem driverItem;
+    readonly Forms.ToolStripMenuItem updateItem;
     LinkState state = (LinkState)(-1);
     string stateText = "";
     string lastAttachError = "";
@@ -19,6 +21,7 @@ public sealed class Controller
     bool autoScanned;
     bool driverReady;
     bool installing;
+    bool updateAnnounced;
     DateTime lastRoamScan = DateTime.MinValue;
     CancellationTokenSource wake = new();
 
@@ -30,6 +33,11 @@ public sealed class Controller
         window.FindClicked += async () => await ScanAsync();
         window.InstallDriverClicked += async () => await InstallDriverAsync();
         window.QuitClicked += async () => await ExitAsync();
+        window.UpdateClicked += async () =>
+        {
+            if (updater.Pending != null) RestartToUpdate();
+            else await CheckForUpdatesAsync(manual: true);
+        };
         window.HiddenToTray += () =>
         {
             if (settings.TrayHintShown) return;
@@ -40,16 +48,21 @@ public sealed class Controller
 
         connectItem = new Forms.ToolStripMenuItem("Disconnect", null, async (_, _) => await ToggleConnectAsync());
         driverItem = new Forms.ToolStripMenuItem("Install USB driver", null, async (_, _) => await InstallDriverAsync());
+        updateItem = new Forms.ToolStripMenuItem("Restart to update", null, (_, _) => RestartToUpdate());
         var menu = new Forms.ContextMenuStrip();
         menu.Items.Add("Open PadLink", null, (_, _) => window.ShowAndActivate());
         menu.Items.Add(connectItem);
         menu.Items.Add(driverItem);
+        menu.Items.Add(updateItem);
         menu.Items.Add(new Forms.ToolStripSeparator());
         menu.Items.Add("Quit", null, async (_, _) => await ExitAsync());
         menu.Opening += (_, _) =>
         {
             connectItem.Text = settings.AutoConnect ? "Disconnect" : "Connect";
             driverItem.Visible = !driverReady;
+            var pending = updater.Pending;
+            updateItem.Visible = pending != null;
+            if (pending != null) updateItem.Text = $"Restart to update to {pending.Version}";
         };
 
         tray = new Forms.NotifyIcon { Icon = Icons.Off, Text = "PadLink", Visible = true, ContextMenuStrip = menu };
@@ -61,6 +74,7 @@ public sealed class Controller
 
     async Task StartAsync()
     {
+        _ = UpdateLoopAsync();
         window.SetDriverStatus(false, installing: false);
         driverReady = await Task.Run(Driver.IsReady);
         window.SetDriverStatus(driverReady);
@@ -116,6 +130,70 @@ public sealed class Controller
     }
 
     void WakeLoop() => wake.Cancel();
+
+    // ---------- updates (Velopack + GitHub Releases) ----------
+
+    async Task UpdateLoopAsync()
+    {
+        if (!updater.IsInstalled)
+        {
+            window.SetUpdateStatus($"Version {updater.CurrentVersion}, development build. Install PadLink from GitHub Releases to get automatic updates.", null);
+            return;
+        }
+        ShowUpdateState();
+        await Task.Delay(TimeSpan.FromSeconds(10)); // let the controller connect first
+        while (!exiting)
+        {
+            await CheckForUpdatesAsync(manual: false);
+            await Task.Delay(TimeSpan.FromHours(6));
+        }
+    }
+
+    async Task CheckForUpdatesAsync(bool manual)
+    {
+        window.SetUpdateStatus($"Version {updater.CurrentVersion}. Checking for updates…", "Check now", enabled: false);
+        try
+        {
+            await updater.CheckAndDownloadAsync();
+            ShowUpdateState();
+        }
+        catch (Exception ex)
+        {
+            if (manual) window.Log("Update check failed: " + ex.Message);
+            window.SetUpdateStatus($"Version {updater.CurrentVersion}. Couldn't check for updates.", "Check now");
+        }
+    }
+
+    void ShowUpdateState()
+    {
+        if (updater.Pending is { } p)
+        {
+            window.SetUpdateStatus($"Version {p.Version} is ready. Restart to install it, or it installs when you quit PadLink.", "Restart now", primary: true);
+            if (updateAnnounced) return;
+            updateAnnounced = true;
+            window.Log($"Update {p.Version} downloaded");
+            tray.ShowBalloonTip(3000, "PadLink update ready", $"Version {p.Version} installs the next time PadLink restarts.", Forms.ToolTipIcon.None);
+        }
+        else window.SetUpdateStatus($"Version {updater.CurrentVersion}. You're up to date.", "Check now");
+    }
+
+    /// <summary>
+    /// Restart into the new version. The controller stays attached: the USB/IP link lives in the driver,
+    /// and the new instance picks it up as already connected.
+    /// </summary>
+    void RestartToUpdate()
+    {
+        if (updater.Pending is not { } p || exiting) return;
+        exiting = true;
+        tray.Visible = false;
+        tray.Dispose();
+        try { updater.ApplyAndRestart(p); } // exits this process
+        catch (Exception ex)
+        {
+            System.Windows.MessageBox.Show("Couldn't install the update: " + ex.Message, "PadLink");
+            Application.Current.Shutdown();
+        }
+    }
 
     async Task LoopAsync()
     {
@@ -281,6 +359,10 @@ public sealed class Controller
             await Task.Run(() => UsbipExe.DetachHost(host));
         tray.Visible = false;
         tray.Dispose();
+        if (updater.Pending is { } update)
+        {
+            try { updater.ApplyOnExit(update); } catch { } // installs quietly after we exit
+        }
         window.ForceClose();
         Application.Current.Shutdown();
     }
